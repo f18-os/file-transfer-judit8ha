@@ -7,7 +7,7 @@ sys.path.append("../lib")       # for params
 
 import params
 
-from framedSock import framedSend, framedReceive
+from fSock import framedSend, framedReceive
 
 
 switchesVarDefaults = (

@@ -1,8 +1,11 @@
 #! /usr/bin/env python3
+
 import sys
 
 sys.path.append("../lib")       # for params
-import re, socket, params
+
+import os, socket, params
+
 
 
 switchesVarDefaults = (
@@ -25,17 +28,18 @@ lsock.bind(bindAddr)
 lsock.listen(5)
 print("listening on:", bindAddr)
 
-sock, addr = lsock.accept()
-
-print("connection rec'd from", addr)
-
-
-from framedSock import framedSend, framedReceive
-
 while True:
-    payload = framedReceive(sock, debug)
-    if debug: print("rec'd: ", payload)
-    if not payload:
-        break
-    payload += b"!"             # make emphatic!
-    framedSend(sock, payload, debug)
+    sock, addr = lsock.accept()
+
+    from fSock import framedSend, framedReceive
+
+    if not os.fork():
+        print("new child process handling connection from", addr)
+        while True:
+            payload = framedReceive(sock, debug)
+            if debug: print("rec'd: ", payload)
+            if not payload:
+                if debug: print("child exiting")
+                sys.exit(0)
+            payload += b"!"             # make emphatic!
+            framedSend(sock, payload, debug)

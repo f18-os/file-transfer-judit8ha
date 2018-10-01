@@ -2,6 +2,7 @@
 import sys
 
 sys.path.append("../lib")       # for params
+
 import re, socket, params
 
 
@@ -30,7 +31,7 @@ sock, addr = lsock.accept()
 print("connection rec'd from", addr)
 
 
-from framedSock import framedSend, framedReceive
+from fSock import framedSend, framedReceive
 
 while True:
     payload = framedReceive(sock, debug)
