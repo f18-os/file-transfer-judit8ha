@@ -8,6 +8,7 @@ if len(argv):
 
 switchesVarDefaults = ()
 
+
 def parseParams(_switchesVarDefaults):
     global switchesVarDefaults
     paramMap = {}
@@ -30,7 +31,8 @@ def parseParams(_switchesVarDefaults):
         print("Problem parsing parameters (exception=%s)" % e)
         usage()
     return paramMap
-        
+
+
 def usage():
     print("%s usage:" % progName)
     for switches, param, default in switchesVarDefaults:

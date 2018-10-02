@@ -3,28 +3,24 @@
 # Echo client program
 import socket, sys, re
 
-sys.path.append("../lib")       # for params
-
+sys.path.append("../lib")  # for params
 import params
 
-from fSock import framedSend, framedReceive
-
+from fSock import framedSend, framedReceive, put
 
 switchesVarDefaults = (
     (('-s', '--server'), 'server', "127.0.0.1:50001"),
-    (('-d', '--debug'), "debug", False), # boolean (set if present)
-    (('-?', '--usage'), "usage", False), # boolean (set if present)
-    )
-
+    (('-d', '--debug'), "debug", False),  # boolean (set if present)
+    (('-?', '--usage'), "usage", False),  # boolean (set if present)
+)
 
 progname = "framedClient"
 paramMap = params.parseParams(switchesVarDefaults)
 
-server, usage, debug  = paramMap["server"], paramMap["usage"], paramMap["debug"]
+server, usage, debug = paramMap["server"], paramMap["usage"], paramMap["debug"]
 
 if usage:
     params.usage()
-
 
 try:
     serverHost, serverPort = re.split(":", server)
@@ -58,11 +54,10 @@ if s is None:
     sys.exit(1)
 
 
-print("sending hello world")
-framedSend(s, b"hello world", debug)
-print("received:", framedReceive(s, debug))
+clientIn = input("client: ")
+msg = clientIn.split(" ")
+if msg[0] == "put":
+    put(s, msg[1])
 
-print("sending hello world")
-framedSend(s, b"hello world", debug)
+print("sent")
 print("received:", framedReceive(s, debug))
-
