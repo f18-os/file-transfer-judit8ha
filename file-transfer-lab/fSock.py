@@ -1,10 +1,11 @@
 import re, os, sys
 
-def put(sock, filename):
+def put(sock, filename,debug=1):
     try:
         with open(filename) as f: payload = f.readlines()
         payload = "".join(payload)
         msg = str(len(payload)).encode() + b':' + filename.encode() + b':' + payload.encode()
+        if debug: print("framedSend: sending %d byte file" % len(payload))
         while len(msg):
             nsent = sock.send(msg[:100])
             msg = msg[nsent:]
@@ -12,7 +13,7 @@ def put(sock, filename):
         print("File Not Found")
 
 
-def framedSend(sock, payload, debug=0):
+def framedSend(sock, payload, debug=1):
     if debug: print("framedSend: sending %d byte message" % len(payload))
     msg = str(len(payload)).encode() + b':' + payload.encode()
     while len(msg):
@@ -32,12 +33,16 @@ def framedReceive(sock, debug=1):
     msgLength = -1
     while True:
         if (state == "getLength"):
+            if debug: print("getLength State")
             match = re.match(b'([^:]+):([^:]+):(.*)', rbuf, re.DOTALL | re.MULTILINE)  # look for colon
             if match:
+                if debug: print("matched file")
                 lengthStr, fn, rbuf = match.groups()
                 if rbuf is None:
+                    if debug: print("message")
                     rbuf = fn
                 else:
+                    if debug: print("file")
                     fileName = fn
                 try:
                     msgLength = int(lengthStr)
@@ -58,6 +63,6 @@ def framedReceive(sock, debug=1):
         if len(r) == 0:
             if len(rbuf) != 0:
                 print("FramedReceive: incomplete message. \n  state=%s, length=%d, rbuf=%s" % (state, msgLength, rbuf))
-            file.write(rbuf)
+            if file: file.write(rbuf)
             return None
         if debug: print("FramedReceive: state=%s, length=%d, rbuf=%s" % (state, msgLength, rbuf))
