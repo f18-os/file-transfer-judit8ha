@@ -32,7 +32,9 @@ while True:
     if not os.fork():
         print("new child process handling connection from", addr)
         while True:
+            print("while true")
             payload = framedReceive(sock, debug)
+            print("payload set")
             if debug: print("rec'd: ", payload)
             if not payload:
                 if debug: print("child exiting")

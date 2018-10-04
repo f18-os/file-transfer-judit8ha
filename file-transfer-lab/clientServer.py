@@ -57,8 +57,8 @@ if s is None:
 clientIn = input("client: ")
 msg = clientIn.split(" ")
 if msg[0] == "put":
-    put(s, msg[1])
-else:
+    put(s, msg[1],1)
+elif msg:
     framedSend(s, " ".join(msg))
 
 print("sent")
