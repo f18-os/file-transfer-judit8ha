@@ -58,6 +58,8 @@ clientIn = input("client: ")
 msg = clientIn.split(" ")
 if msg[0] == "put":
     put(s, msg[1])
+else:
+    framedSend()
 
 print("sent")
 print("received:", framedReceive(s, debug))
