@@ -6,7 +6,7 @@ import socket, sys, re
 sys.path.append("../lib")  # for params
 import params
 
-from fSock import framedSend, framedReceive, put
+from fSock import framedSend, framedReceive
 
 switchesVarDefaults = (
     (('-s', '--server'), 'server', "127.0.0.1:50001"),
@@ -54,12 +54,23 @@ if s is None:
     sys.exit(1)
 
 
+def put(filename):
+    try:
+        with open(filename) as f:
+            payload = f.read()
+        print(payload)
+        framedSend(s, filename.encode('utf-8') + b'~' + payload.encode('utf-8'))
+    except FileNotFoundError:
+        print("File Not Found")
+
+
 clientIn = input("client: ")
 msg = clientIn.split(" ")
 if msg[0] == "put":
-    put(s, msg[1],1)
-elif msg:
-    framedSend(s, " ".join(msg))
+    put(msg[1])
+
+
+
 
 print("sent")
 print("received:", framedReceive(s, debug))
