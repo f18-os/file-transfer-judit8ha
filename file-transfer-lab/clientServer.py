@@ -1,8 +1,6 @@
 #! /usr/bin/env python3
 
-# Echo client program
-import socket, sys, re,
-
+import socket, sys, re
 sys.path.append("../lib")  # for params
 import params
 
