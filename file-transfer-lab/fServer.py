@@ -26,28 +26,34 @@ print("listening on:", bindAddr)
 
 while True:
     sock, addr = lsock.accept()
+    f = ""
 
     from fSock import framedSend, framedReceive
 
     if not os.fork():
         print("new child process handling connection from", addr)
         while True:
-            f = None
-            print("while true")
+            if debug: print("entered loop")
             payload = framedReceive(sock, debug)
-            for p in payload:
-                if p == b'~':
-                    f = payload[:b'~']
-                    payload = payload[b'~':]
-            if f:
-                file= open(f, 'w')
-                file.write(payload)
-                file.close()
+            if debug: print("received payload")
+            if payload:
+                for p in payload:
+                    if p == b'~':
+                        f = payload[:b'~']
+                        payload = payload[b'~':]
+                        break
 
-            if debug: print("rec'd: ", payload)
-            if not payload:
-                if debug: print("child exiting")
-                sys.exit(0)
-            payload+= b'got it!'
-            framedSend(sock, payload, debug)
+                if len(f) > 1:
+                    if debug: print("-File Received-")
+                    file= open(f, 'w')
+                    file.write(payload)
+                    file.close()
+                    payload += b'got file!'
 
+                if debug: print("rec'd: ", payload)
+                if not payload:
+                    if debug: print("child exiting")
+                    sys.exit(0)
+                framedSend(sock, payload, debug)
+            else:
+                if debug: print("no payload received")

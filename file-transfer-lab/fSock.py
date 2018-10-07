@@ -13,22 +13,26 @@ rbuf = b""  # static receive buffer
 
 
 def framedReceive(sock, debug=1):
+    if debug: print("receiving")
     global rbuf
     state = "getLength"
     msgLength = -1
     while True:
         if (state == "getLength"):
+            if debug: print("getLength State")
             match = re.match(b'([^:]+):(.*)', rbuf, re.DOTALL | re.MULTILINE)  # look for colon
             if match:
                 lengthStr, rbuf = match.groups()
                 try:
                     msgLength = int(lengthStr)
+                    if debug: print("receiving msg size:", msgLength)
                 except:
                     if len(rbuf):
                         print("badly formed message length:", lengthStr)
                         return None
                 state = "getPayload"
         if state == "getPayload":
+            if debug: print("get Payload")
             if len(rbuf) >= msgLength:
                 payload = rbuf[0:msgLength]
                 rbuf = rbuf[msgLength:]

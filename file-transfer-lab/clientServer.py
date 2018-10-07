@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # Echo client program
-import socket, sys, re
+import socket, sys, re,
 
 sys.path.append("../lib")  # for params
 import params
@@ -64,13 +64,13 @@ def put(filename):
         print("File Not Found")
 
 
-clientIn = input("client: ")
+clientIn = input("client:")
 msg = clientIn.split(" ")
 if msg[0] == "put":
     put(msg[1])
+    print("sent file")
+else:
+    framedSend(s, clientIn.encode(), debug)
+    print("sent msg")
 
-
-
-
-print("sent")
 print("received:", framedReceive(s, debug))
