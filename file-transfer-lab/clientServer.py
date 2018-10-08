@@ -56,7 +56,6 @@ def put(filename): # FOR FILE SENDING
     try:
         with open(filename) as f:
             payload = f.read()
-        print(payload)
         framedSend(s, filename.encode('utf-8') + b"/" + payload.encode('utf-8'))
     except FileNotFoundError:
         print("File Not Found")
@@ -65,11 +64,11 @@ def put(filename): # FOR FILE SENDING
 while True:
     clientIn = input("client:")
     msg = clientIn.split(" ")
-    if msg[0] == "put":  #IF 'PUT' THEN MESSAGE GETS SENT AS A FILE
+    if msg[0] == "put":  #IF PUT THEN MESSAGE GETS SENT AS A FILE
         put(msg[1])
         print("sent file")
     elif msg[0] == "./END":  #THIS WILL CLOSE SOCKET AND END CONNECTION
-            s.close()
+            sys.exit(1)
     else:
         framedSend(s, clientIn.encode(), debug)
         print("sent msg")

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import sys, os, socket, re,
+import sys, os, socket, re
 sys.path.append("../lib")       # for params
 import params
 
@@ -39,18 +39,18 @@ while True:
             if debug: print("rec'd: ", payload)
             try:
                 p = payload.decode().split('/')
-                if sys.path(p[0]+'RC'):
-                    print("FILE ALREADY EXISTS. OVERWRITE?")
-                f = open(p[0]+'RC', 'w')
-                f.write(p[1])
-                f.close()
-                msgType = b"FILE"
-                print("-file saved-")
+                if p[1]:
+                    if os.path.isfile(p[0]+'RC'): framedSend(sock, b'FILE EXISTS... OVERWRITING', debug)
+                    f = open(p[0]+'RC', 'w')
+                    f.write(p[1])
+                    f.close()
+                    msgType = b"FILE"
+                    print("-file saved-")
             except:
                 msgType = b"MESSAGE"
 
             if not payload:
-                if debug: print("CONNECTION TO CLIENT ENDED")
+                print("CONNECTION TO CLIENT ENDED")
                 sys.exit(1)  #END CONNECTION WITH NO ERROR MESSAGES
             payload = b"received: " + msgType
             framedSend(sock, payload, debug)
