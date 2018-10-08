@@ -57,18 +57,23 @@ def put(filename):
         with open(filename) as f:
             payload = f.read()
         print(payload)
-        framedSend(s, filename.encode('utf-8') + b'~' + payload.encode('utf-8'))
+        framedSend(s, filename.encode('utf-8') + b"/" + payload.encode('utf-8'))
     except FileNotFoundError:
         print("File Not Found")
 
 
-clientIn = input("client:")
-msg = clientIn.split(" ")
-if msg[0] == "put":
-    put(msg[1])
-    print("sent file")
-else:
-    framedSend(s, clientIn.encode(), debug)
-    print("sent msg")
+while True:
+    clientIn = input("client:")
+    msg = clientIn.split(" ")
+    if msg[0] == "put":
+        put(msg[1])
+        print("sent file")
 
-print("received:", framedReceive(s, debug))
+    elif msg[0] == "./end":
+            s.close()
+
+    else:
+        framedSend(s, b" /" + clientIn.encode(), debug)
+        print("sent msg")
+
+    print("received:", framedReceive(s, debug))

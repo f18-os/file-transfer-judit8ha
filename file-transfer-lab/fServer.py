@@ -5,9 +5,9 @@ sys.path.append("../lib")       # for params
 import params
 
 switchesVarDefaults = (
-    (('-l', '--listenPort') ,'listenPort', 50001),
-    (('-d', '--debug'), "debug", False), # boolean (set if present)
-    (('-?', '--usage'), "usage", False), # boolean (set if present)
+    (('-l', '--listenPort'), 'listenPort', 50001),
+    (('-d', '--debug'), "debug", True),  # boolean (set if present)
+    (('-?', '--usage'), "usage", False),  # boolean (set if present)
     )
 
 progname = "echoserver"
@@ -24,6 +24,7 @@ lsock.bind(bindAddr)
 lsock.listen(5)
 print("listening on:", bindAddr)
 
+content = b""
 while True:
     sock, addr = lsock.accept()
     f = ""
@@ -36,24 +37,24 @@ while True:
             if debug: print("entered loop")
             payload = framedReceive(sock, debug)
             if debug: print("received payload")
-            if payload:
-                for p in payload:
-                    if p == b'~':
-                        f = payload[:b'~']
-                        payload = payload[b'~':]
-                        break
-
+            match = re.match(b"([^/]+)/(.*)", content, re.DOTALL | re.MULTILINE)  # look for colon
+            if match:
+                f, content = match.groups()
                 if len(f) > 1:
                     if debug: print("-File Received-")
-                    file= open(f, 'w')
-                    file.write(payload)
+                    file = open(f, 'w')
+                    file.write(content + "modified")
                     file.close()
-                    payload += b'got file!'
-
-                if debug: print("rec'd: ", payload)
-                if not payload:
-                    if debug: print("child exiting")
-                    sys.exit(0)
-                framedSend(sock, payload, debug)
+                    content += b'got file!'
+                    if debug: print("rec'd: ", content)
+                    framedSend(sock, content, debug)
+                else:
+                    if debug: print("-message received-")
+                    print(content)
+                    framedSend(sock, content, debug)
             else:
                 if debug: print("no payload received")
+                if debug: print("child exiting")
+                break
+            sys.exit(0)
+    sys.exit(0)
