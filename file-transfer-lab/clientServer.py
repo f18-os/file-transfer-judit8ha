@@ -52,7 +52,7 @@ if s is None:
     sys.exit(1)
 
 
-def put(filename):
+def put(filename): # FOR FILE SENDING
     try:
         with open(filename) as f:
             payload = f.read()
@@ -65,15 +65,12 @@ def put(filename):
 while True:
     clientIn = input("client:")
     msg = clientIn.split(" ")
-    if msg[0] == "put":
+    if msg[0] == "put":  #IF 'PUT' THEN MESSAGE GETS SENT AS A FILE
         put(msg[1])
         print("sent file")
-
-    elif msg[0] == "./end":
+    elif msg[0] == "./END":  #THIS WILL CLOSE SOCKET AND END CONNECTION
             s.close()
-
     else:
-        framedSend(s, b" /" + clientIn.encode(), debug)
+        framedSend(s, clientIn.encode(), debug)
         print("sent msg")
-
     print("received:", framedReceive(s, debug))

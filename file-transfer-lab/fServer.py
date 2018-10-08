@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-import sys, os, socket, re
+import sys, os, socket, re,
 sys.path.append("../lib")       # for params
 import params
 
 switchesVarDefaults = (
     (('-l', '--listenPort'), 'listenPort', 50001),
-    (('-d', '--debug'), "debug", True),  # boolean (set if present)
+    (('-d', '--debug'), "debug", False),  # boolean (set if present)
     (('-?', '--usage'), "usage", False),  # boolean (set if present)
     )
 
@@ -25,36 +25,32 @@ lsock.listen(5)
 print("listening on:", bindAddr)
 
 content = b""
+
 while True:
     sock, addr = lsock.accept()
-    f = ""
+    msgType = "" #MESSAGE RECEIVED TYPE - FILE OR MESSAGE -
 
     from fSock import framedSend, framedReceive
 
     if not os.fork():
         print("new child process handling connection from", addr)
         while True:
-            if debug: print("entered loop")
             payload = framedReceive(sock, debug)
-            if debug: print("received payload")
-            match = re.match(b"([^/]+)/(.*)", content, re.DOTALL | re.MULTILINE)  # look for colon
-            if match:
-                f, content = match.groups()
-                if len(f) > 1:
-                    if debug: print("-File Received-")
-                    file = open(f, 'w')
-                    file.write(content + "modified")
-                    file.close()
-                    content += b'got file!'
-                    if debug: print("rec'd: ", content)
-                    framedSend(sock, content, debug)
-                else:
-                    if debug: print("-message received-")
-                    print(content)
-                    framedSend(sock, content, debug)
-            else:
-                if debug: print("no payload received")
-                if debug: print("child exiting")
-                break
-            sys.exit(0)
-    sys.exit(0)
+            if debug: print("rec'd: ", payload)
+            try:
+                p = payload.decode().split('/')
+                if sys.path(p[0]+'RC'):
+                    print("FILE ALREADY EXISTS. OVERWRITE?")
+                f = open(p[0]+'RC', 'w')
+                f.write(p[1])
+                f.close()
+                msgType = b"FILE"
+                print("-file saved-")
+            except:
+                msgType = b"MESSAGE"
+
+            if not payload:
+                if debug: print("CONNECTION TO CLIENT ENDED")
+                sys.exit(1)  #END CONNECTION WITH NO ERROR MESSAGES
+            payload = b"received: " + msgType
+            framedSend(sock, payload, debug)
